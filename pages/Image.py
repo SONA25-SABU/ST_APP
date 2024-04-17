@@ -1,35 +1,32 @@
 import streamlit as st
-import cv2
 import numpy as np
+from PIL import Image, ImageOps, ImageFilter
 import matplotlib.pyplot as plt
 
 st.title('Image Processing')
 
 # Load the original image
-original_image = cv2.imread("image4.jpg")
+original_image = Image.open("image4.jpg")
 
 # Function to resize image
 def resize_image(image, width, height):
-    return cv2.resize(image, (width, height))
+    return image.resize((width, height))
 
 # Function to convert to grayscale
 def grayscale(image):
-    return cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    return ImageOps.grayscale(image)
 
 # Function to crop image
 def crop_image(image, x, y, w, h):
-    return image[y:y+h, x:x+w]
+    return image.crop((x, y, x+w, y+h))
 
 # Function to rotate image
 def rotate_image(image, angle):
-    (h, w) = image.shape[:2]
-    center = (w // 2, h // 2)
-    rotation_matrix = cv2.getRotationMatrix2D(center, angle, 1.0)
-    return cv2.warpAffine(image, rotation_matrix, (w, h))
+    return image.rotate(angle, expand=True)
 
 # Function to blur image
-def blur_image(image, kernel_size):
-    return cv2.GaussianBlur(image, (kernel_size, kernel_size), 0)
+def blur_image(image, radius):
+    return image.filter(ImageFilter.GaussianBlur(radius))
 
 # Processing
 resized_image = resize_image(original_image, 400, 400)
@@ -42,7 +39,7 @@ blurred_image = blur_image(rotated_image, 5)
 plt.figure(figsize=(12, 8))
 
 plt.subplot(231)
-plt.imshow(cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB))
+plt.imshow(original_image)
 plt.title('Original Image')
 plt.axis('off')
 
